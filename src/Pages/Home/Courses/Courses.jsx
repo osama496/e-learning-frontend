@@ -10,7 +10,7 @@ function Courses() {
   const teachersList = async(sub)=>{
     setLoading(true);
 
-    const response = await fetch(`/api/course/${sub}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/${sub}`, {
       method: 'GET',
       credentials: "include",
       headers: {

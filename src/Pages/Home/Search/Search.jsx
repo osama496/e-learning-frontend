@@ -23,7 +23,7 @@ function search() {
     
     let SearchTeacher = async()=>{
         let Subject = data.toLowerCase();
-        let Data = await fetch(`/api/course/${Subject}`)
+        let Data = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/${Subject}`)
         let response = await Data.json();
         if(response.statusCode == 200){
         setCourse(response.data)
@@ -39,7 +39,7 @@ function search() {
     const openTeacherDec = async(id,fname,lname,sub)=>{
         setTname({fname,lname,sub});
 
-        const data = await fetch('/api/teacher/teacherdocuments',{
+        const data = await fetch('${import.meta.env.VITE_API_BASE_URL}/api/teacher/teacherdocuments',{
             method: 'POST',
             credentials: "include",
             headers: {

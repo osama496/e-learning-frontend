@@ -17,7 +17,7 @@ function Withdrawal({onClose,TA}) {
       alert('Enter a valid Amount')
     }else{
       try {
-        const response = await fetch(`/api/payment/teacher/${ID}/withdraw`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payment/teacher/${ID}/withdraw`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

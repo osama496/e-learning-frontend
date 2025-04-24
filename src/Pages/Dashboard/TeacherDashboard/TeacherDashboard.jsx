@@ -9,7 +9,7 @@ function TeacherDashboard() {
   const [data, setdata] = useState([]);
 
   const Handlelogout = async() =>{
-    const response = await fetch(`/api/teacher/logout`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/teacher/logout`, {
       method: 'POST',
       credentials: "include",
       headers: {
@@ -26,7 +26,7 @@ function TeacherDashboard() {
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await fetch(`/api/Teacher/TeacherDocument/${ID}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/Teacher/TeacherDocument/${ID}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

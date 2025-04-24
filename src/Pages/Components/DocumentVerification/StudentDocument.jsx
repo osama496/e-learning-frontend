@@ -15,7 +15,7 @@ const StudentDocument = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await fetch(`/api/student/StudentDocument/${Data}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/student/StudentDocument/${Data}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -74,7 +74,7 @@ const StudentDocument = () => {
     });
 
     try {
-      const response = await fetch(`/api/student/verification/${Data}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/student/verification/${Data}`, {
         method: "POST",
         body: formDataObj,
       });

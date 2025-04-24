@@ -10,7 +10,7 @@ function StudentClasses() {
     useEffect(() => {
         const getData = async () => {
           try {
-            const response = await fetch(`/api/course/classes/student/${ID}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/classes/student/${ID}`, {
               method: 'GET',
               headers: {
                 'Content-Type': 'application/json',

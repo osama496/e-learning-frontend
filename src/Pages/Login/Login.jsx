@@ -47,7 +47,7 @@ export default function Login() {
 
     try {
       // Send data to backend (you need to implement this part)
-      const response = await fetch(`/api/${userType}/login`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/${userType}/login`, {
         method: 'POST',
         credentials: "include",
         headers: {

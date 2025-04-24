@@ -1,0 +1,1 @@
+export const BaseUrl = "https://e-learning-backend-one.vercel.app"
