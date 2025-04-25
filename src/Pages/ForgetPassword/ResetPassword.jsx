@@ -45,7 +45,10 @@ const ResetPassword = () => {
       return;
     }
     
-    const response= axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/student/forgetpassword/${token}`,{password:data.password,confirmPassword:data.confirmPassword})
+    const response= axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/student/forgetpassword/${token}`,{
+      withCredentials:true,
+      mode:"cors",
+      password:data.password,confirmPassword:data.confirmPassword})
      toast.promise(response,{
         loading:"wait for processing",
         success:(response)=> response?.data?.message,

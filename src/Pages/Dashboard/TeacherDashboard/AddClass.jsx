@@ -45,6 +45,8 @@ function AddClass({ onClose }) {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/Teacher/${ID}/enrolled`, {
           method: 'GET',
+          credentials: "include",
+          cors: "include",
           headers: {
             'Content-Type': 'application/json',
           },
@@ -75,6 +77,8 @@ function AddClass({ onClose }) {
   }, [CourseId]);
   
 
+  console.log("courses", courses);
+
   const addCourses = async () => {
     const currentDate = new Date();
     const givenDate = new Date(date);
@@ -100,6 +104,8 @@ function AddClass({ onClose }) {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/${CourseId}/teacher/${ID}/add-class`, {
           method: 'POST',
+          credentials: "include",
+          cors: "include",
           headers: {
             'Content-Type': 'application/json',
           },

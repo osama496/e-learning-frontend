@@ -15,6 +15,8 @@ function StudentCourses() {
         try {
           const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/student/${ID}/enrolled`, {
             method: 'GET',
+            credentials: "include",
+            cors: "include",
             headers: {
               'Content-Type': 'application/json',
             },
@@ -37,7 +39,19 @@ function StudentCourses() {
 
   const openpopup = async(sub)=>{ 
     setsubDetails(sub);
-    await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/course/${sub.coursename}`)
+    await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/course/${sub.coursename}`,{
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: "include",
+      cors: "include",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: "include",
+      cors: "include",
+    })
       .then(res => {setPopup(true);
       setsubD(res.data.data)})
   }

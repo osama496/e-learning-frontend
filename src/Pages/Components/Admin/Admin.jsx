@@ -23,6 +23,8 @@ const Admin = () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/messages/all`, {
           method: "GET",
+          mode: "cors",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -46,6 +48,8 @@ const Admin = () => {
 
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/${adminID}/approve/${type}/${ID}`, {
         method: 'POST',
+        mode: "cors",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -76,6 +80,8 @@ const Admin = () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/${data}/approve`, {
           method: "POST",
+          mode: "cors",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },

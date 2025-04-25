@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   server:{
     proxy:{
-      '${import.meta.env.VITE_API_BASE_URL}/api': 'https://e-learning-backend-one.vercel.app'
+      '${import.meta.env.VITE_API_BASE_URL}': 'http://localhost:8000'
     }
   },
   plugins: [react()],

@@ -33,7 +33,10 @@ const Forgetpassword = () => {
     }
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/${userType}/forgetpassword`, { Email: data.email});
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/${userType}/forgetpassword`, {
+        withCredentials: true,
+        mode: "cors",
+        Email: data.email});
       console.log(response.data);
       toast.success('Email sent successfully');
     } catch (error) {

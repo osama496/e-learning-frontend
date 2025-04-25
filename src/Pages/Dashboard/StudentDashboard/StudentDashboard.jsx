@@ -29,6 +29,8 @@ function StudentDashboard() {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/Student/StudentDocument/${ID}`, {
           method: 'GET',
+          mode: 'cors',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           }

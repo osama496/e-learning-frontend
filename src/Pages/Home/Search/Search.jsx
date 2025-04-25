@@ -23,7 +23,14 @@ function search() {
     
     let SearchTeacher = async()=>{
         let Subject = data.toLowerCase();
-        let Data = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/${Subject}`)
+        let Data = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/${Subject}`,{
+            method: 'GET',
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cors: "include",
+        })
         let response = await Data.json();
         if(response.statusCode == 200){
         setCourse(response.data)

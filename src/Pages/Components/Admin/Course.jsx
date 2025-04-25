@@ -44,7 +44,9 @@ const Course = () => {
   useEffect(() => {
     const fetchCourseRequests = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/${data}/approve/course`);
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/${data}/approve/course`, {
+          withCredentials: true, 
+        });
         console.log("dtat",response.data.data);
         setCourseReq(response.data.data);
       } catch (error) {
@@ -90,6 +92,7 @@ const Course = () => {
         email: info.Email,
         Firstname: info.enrolledteacher,
       }, {
+        withCredentials:true,
         headers: {
           "Content-Type": "application/json",
         },
@@ -115,6 +118,7 @@ const Course = () => {
         email: info.Email,
         Firstname: info.enrolledteacher,
       }, {
+        withCredentials:true,
         headers: {
           "Content-Type": "application/json",
         },

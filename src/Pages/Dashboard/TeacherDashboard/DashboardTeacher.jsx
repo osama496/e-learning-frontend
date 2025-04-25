@@ -32,6 +32,8 @@ function DashboardTeacher() {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/Teacher/TeacherDocument/${ID}`, {
           method: "GET",
+          mode: "cors",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -74,6 +76,8 @@ function DashboardTeacher() {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payment/teacher/${ID}/balance`, {
           method: "POST",
+          mode: "cors",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -99,6 +103,8 @@ function DashboardTeacher() {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/Teacher/${ID}/enrolled`, {
           method: "GET",
+          credentials: "include",
+          cors: "include",
           headers: {
             "Content-Type": "application/json",
           },

@@ -19,6 +19,8 @@ function Withdrawal({onClose,TA}) {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payment/teacher/${ID}/withdraw`, {
           method: 'POST',
+          mode: "cors",
+          credentials: "include",
           headers: {
             'Content-Type': 'application/json',
           },

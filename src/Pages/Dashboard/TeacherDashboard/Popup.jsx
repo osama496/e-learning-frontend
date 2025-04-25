@@ -234,6 +234,8 @@ function Popup({ onClose, subject }) {
     // Call API
     const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/${subject}/create/${ID}`, {
       method: 'POST',
+      credentials: 'include',
+      mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
       },

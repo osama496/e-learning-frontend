@@ -12,6 +12,8 @@ function StudentClasses() {
           try {
             const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/classes/student/${ID}`, {
               method: 'GET',
+              credentials: "include",
+              cors: "include",
               headers: {
                 'Content-Type': 'application/json',
               },

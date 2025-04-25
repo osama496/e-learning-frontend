@@ -17,6 +17,8 @@ const StudentDocument = () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/student/StudentDocument/${Data}`, {
           method: "GET",
+          mode: "cors",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -76,6 +78,7 @@ const StudentDocument = () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/student/verification/${Data}`, {
         method: "POST",
+        credentials: "include",
         body: formDataObj,
       });
 

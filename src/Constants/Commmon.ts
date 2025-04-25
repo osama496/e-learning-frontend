@@ -1,1 +1,1 @@
-export const BaseUrl = "https://e-learning-backend-one.vercel.app"
+export const BaseUrl = "http://localhost:8000"

@@ -45,6 +45,8 @@ const ResetTeacher = () => {
     
     try {
       const response = axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/teacher/forgetpassword/${token}`, {
+        withCredentials: true,
+        mode: "cors",
         password: data.password,
         confirmPassword: data.confirmPassword
       });

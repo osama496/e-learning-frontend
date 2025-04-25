@@ -53,6 +53,8 @@ function Search() {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/student/${ID}/enrolled`, {
           method: 'GET',
+          mode: 'cors',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -78,7 +80,14 @@ function Search() {
 
   const SearchTeacher = async (sub) => {
     const subject = sub.toLowerCase();
-    const Data = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/${subject}`);
+    const Data = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/${subject}`,{
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      cors: "include",
+    });
     const response = await Data.json();
     if (response.statusCode === 200) {
       setCourse(response.data);
@@ -92,6 +101,8 @@ function Search() {
       `${import.meta.env.VITE_API_BASE_URL}/api/course/${courseName}/${id}/verify/student/${ID}`,
       {
         method: "POST",
+        credentials: "include",
+        cors: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -106,6 +117,8 @@ function Search() {
 
     const data = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payment/course/${id}/${courseName}`, {
       method: "POST",
+      credentials: "include",
+      cors: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -117,6 +130,8 @@ function Search() {
 
     const Key = await fetch("${import.meta.env.VITE_API_BASE_URL}/api/payment/razorkey", {
       method: "GET",
+      credentials: "include",
+      cors: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -146,6 +161,8 @@ function Search() {
           `${import.meta.env.VITE_API_BASE_URL}/api/payment/confirmation/course/${id}`,
           {
             method: "POST",
+            credentials: "include",
+            cors: "include",
             headers: {
               "Content-Type": "application/json",
             },
@@ -161,6 +178,8 @@ function Search() {
               `${import.meta.env.VITE_API_BASE_URL}/api/course/${courseName}/${id}/add/student/${ID}`,
               {
                 method: "POST",
+                credentials: "include",
+                cors: "include",
                 headers: {
                   "Content-Type": "application/json",
                 },
