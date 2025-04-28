@@ -118,123 +118,190 @@ function Search() {
     GetALLCourses();
   },[])
 
+  // const handleEnroll = async (courseName, id) => {
+  //   let check = await fetch(
+  //     `${import.meta.env.VITE_API_BASE_URL}/api/course/${courseName}/${id}/verify/student/${ID}`,
+  //     {
+  //       method: "POST",
+  //       credentials: "include",
+  //       cors: "include",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       // body: JSON.stringify({}),
+  //     }
+  //   );
+  //   const res = await check.json();
+
+  //   console.log(res);
+
+  //   if(res.statusCode === 200){
+
+  //   const data = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payment/course/${id}/${courseName}`, {
+  //     method: "POST",
+  //     credentials: "include",
+  //     cors: "include",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({ fees: price[courseName]*100 }),
+  //   });
+
+  //   const DATA = await data.json();
+  //   // console.log(DATA.data.id)
+
+  //   const Key = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payment/razorkey`, {
+  //     method: "GET",
+  //     credentials: "include",
+  //     cors: "include",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
+  //   const response = await Key.json();
+
+  //   const options = {
+  //     key: response.data.key,
+  //     amount: price[courseName]*100,
+  //     currency: "INR",
+  //     name: "Shiksharthee",
+  //     description: "Enroll in a course",
+  //     image: logo,
+  //     order_id: DATA.data.id, // Include the order_id from the response
+  //     handler: async (response) => {
+  //       const { razorpay_payment_id, razorpay_order_id, razorpay_signature } =
+  //         response;
+
+  //       // Send the payment details to the server for verification
+  //       const verificationData = {
+  //         razorpay_payment_id,
+  //         razorpay_order_id,
+  //         razorpay_signature,
+  //       };
+
+  //       const verificationResponse = await fetch(
+  //         `${import.meta.env.VITE_API_BASE_URL}/api/payment/confirmation/course/${id}`,
+  //         {
+  //           method: "POST",
+  //           credentials: "include",
+  //           cors: "include",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify(verificationData),
+  //         }
+  //       );
+
+  //       const res = await verificationResponse.json();
+  //       console.log(res.statusCode);
+  //       if (res.statusCode === 200) {
+  //         try {
+  //           let response = await fetch(
+  //             `${import.meta.env.VITE_API_BASE_URL}/api/course/${courseName}/${id}/add/student/${ID}`,
+  //             {
+  //               method: "POST",
+  //               credentials: "include",
+  //               cors: "include",
+  //               headers: {
+  //                 "Content-Type": "application/json",
+  //               },
+  //               // body: JSON.stringify({}),
+  //             }
+  //           );
+
+  //           let res = await response.json();
+  //           console.log(res);
+  //           setPopup(true);
+  //         } catch (error) {
+  //           console.log(error);
+  //         }
+  //       }
+  //     },
+  //     prefill: {
+  //       name: "Gaurav Kumar",
+  //       email: "gaurav.kumar@example.com",
+  //     },
+  //     notes: {
+  //       address: "Razorpay Corporate Office",
+  //     },
+  //     theme: {
+  //       color: "#3399cc",
+  //     },
+  //   };
+
+  //   const rzp1 = new window.Razorpay(options);
+  //   rzp1.open();
+  //   }else{
+  //     alert(res.message)
+  //   }
+  // };
+
+
   const handleEnroll = async (courseName, id) => {
     let check = await fetch(
       `${import.meta.env.VITE_API_BASE_URL}/api/course/${courseName}/${id}/verify/student/${ID}`,
       {
         method: "POST",
         credentials: "include",
-        cors: "include",
         headers: {
           "Content-Type": "application/json",
         },
-        // body: JSON.stringify({}),
       }
     );
     const res = await check.json();
-
     console.log(res);
-
-    if(res.statusCode === 200){
-
-    const data = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payment/course/${id}/${courseName}`, {
-      method: "POST",
-      credentials: "include",
-      cors: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ fees: price[courseName]*100 }),
-    });
-
-    const DATA = await data.json();
-    // console.log(DATA.data.id)
-
-    const Key = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payment/razorkey`, {
-      method: "GET",
-      credentials: "include",
-      cors: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const response = await Key.json();
-
-    const options = {
-      key: response.data.key,
-      amount: price[courseName]*100,
-      currency: "INR",
-      name: "Shiksharthee",
-      description: "Enroll in a course",
-      image: logo,
-      order_id: DATA.data.id, // Include the order_id from the response
-      handler: async (response) => {
-        const { razorpay_payment_id, razorpay_order_id, razorpay_signature } =
-          response;
-
-        // Send the payment details to the server for verification
-        const verificationData = {
-          razorpay_payment_id,
-          razorpay_order_id,
-          razorpay_signature,
-        };
-
-        const verificationResponse = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/payment/confirmation/course/${id}`,
-          {
-            method: "POST",
-            credentials: "include",
-            cors: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(verificationData),
-          }
-        );
-
-        const res = await verificationResponse.json();
-        console.log(res.statusCode);
-        if (res.statusCode === 200) {
-          try {
-            let response = await fetch(
-              `${import.meta.env.VITE_API_BASE_URL}/api/course/${courseName}/${id}/add/student/${ID}`,
-              {
-                method: "POST",
-                credentials: "include",
-                cors: "include",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                // body: JSON.stringify({}),
-              }
-            );
-
-            let res = await response.json();
-            console.log(res);
-            setPopup(true);
-          } catch (error) {
-            console.log(error);
-          }
+  
+    if (res.statusCode === 200) {
+      // --- FAKE PAYMENT FLOW START ---
+      const fakePaymentData = {
+        razorpay_payment_id: `pay_${Math.random().toString(36).substring(2, 15)}`,
+        razorpay_order_id: `order_${Math.random().toString(36).substring(2, 15)}`,
+        razorpay_signature: `signature_${Math.random().toString(36).substring(2, 15)}`,
+      };
+  
+      // Directly call confirmation API with fake data
+      const verificationResponse = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/payment/confirmation/course/${id}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(fakePaymentData),
         }
-      },
-      prefill: {
-        name: "Gaurav Kumar",
-        email: "gaurav.kumar@example.com",
-      },
-      notes: {
-        address: "Razorpay Corporate Office",
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
-
-    const rzp1 = new window.Razorpay(options);
-    rzp1.open();
-    }else{
-      alert(res.message)
+      );
+  
+      const verificationResult = await verificationResponse.json();
+      console.log(verificationResult.statusCode);
+  
+      if (verificationResult.statusCode === 200) {
+        try {
+          let response = await fetch(
+            `${import.meta.env.VITE_API_BASE_URL}/api/course/${courseName}/${id}/add/student/${ID}`,
+            {
+              method: "POST",
+              credentials: "include",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+  
+          let res = await response.json();
+          console.log(res);
+          setPopup(true);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      // --- FAKE PAYMENT FLOW END ---
+  
+    } else {
+      alert(res.message);
     }
   };
+  
 
   return (
     <>
