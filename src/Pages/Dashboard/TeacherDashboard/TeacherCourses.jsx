@@ -4,6 +4,7 @@ import Popup from './Popup';
 function TeacherCourses() {
   const [showPopup, setShowPopup] = useState(false);
   const [subject, setSubject] = useState('');
+  
 
   const crreateCourse = (sub)=>{
     setShowPopup(true);
@@ -33,7 +34,11 @@ function TeacherCourses() {
             <img src="https://www.figma.com/file/6b4R8evBkii6mI53IA4vSS/image/a64c93efe984ab29f1dfb9e8d8accd9ba449f272" alt="Computer" />
             <p>Computer</p>
           </div>
+          <div className="subject cursor-pointer" onClick={()=>crreateCourse("")}>
+            <p>Add Course</p>
+          </div>
       </div>
+ 
       {showPopup && (
         <Popup onClose={()=> setShowPopup(false)} subject={subject}/>
       )}
