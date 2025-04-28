@@ -33,7 +33,7 @@ function Search() {
   const openTeacherDec = async(id,fname,lname,sub)=>{
     setTname({fname,lname,sub});
 
-    const data = await fetch('${import.meta.env.VITE_API_BASE_URL}/api/teacher/teacherdocuments',{
+    const data = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/teacher/teacherdocuments`,{
         method: 'POST',
         credentials: "include",
         headers: {
@@ -82,11 +82,11 @@ function Search() {
     const subject = sub.toLowerCase();
     const Data = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/${subject}`,{
       method: "GET",
+      mode: "cors",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include",
-      cors: "include",
     });
     const response = await Data.json();
     if (response.statusCode === 200) {
@@ -95,6 +95,28 @@ function Search() {
     }
     setData("");
   };
+
+
+  const GetALLCourses = async () => {
+    const Data = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/all`,{
+      method: "GET",
+      mode: "cors",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const response = await Data.json();
+    if (response.statusCode === 200) {
+      setCourse(response.data);
+      // console.log(response.data);
+    }
+    setData("");
+  };
+
+  useEffect(()=>{
+    GetALLCourses();
+  },[])
 
   const handleEnroll = async (courseName, id) => {
     let check = await fetch(
@@ -128,7 +150,7 @@ function Search() {
     const DATA = await data.json();
     // console.log(DATA.data.id)
 
-    const Key = await fetch("${import.meta.env.VITE_API_BASE_URL}/api/payment/razorkey", {
+    const Key = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/payment/razorkey`, {
       method: "GET",
       credentials: "include",
       cors: "include",
