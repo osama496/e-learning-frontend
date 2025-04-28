@@ -55,7 +55,7 @@ function DashboardTeacher() {
 
   useEffect(()=>{
     const getData = async()=>{
-      const Data = await fetch('${import.meta.env.VITE_API_BASE_URL}/api/teacher/teacherdocuments',{
+      const Data = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/teacher/teacherdocuments`,{
         method: 'POST',
         credentials: "include",
         headers: {

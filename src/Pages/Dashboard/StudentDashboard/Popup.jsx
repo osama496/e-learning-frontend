@@ -23,7 +23,7 @@ function Popup({onClose, subject, allSubject}) {
 
   useEffect(()=>{
     const getData = async()=>{
-      const data = await fetch('${import.meta.env.VITE_API_BASE_URL}/api/teacher/teacherdocuments',{
+      const data = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/teacher/teacherdocuments`,{
         method: 'POST',
         credentials: "include",
         headers: {
