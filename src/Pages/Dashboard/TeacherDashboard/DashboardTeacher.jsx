@@ -92,7 +92,7 @@ function DashboardTeacher() {
       }
     };
     getAmount();
-  }, [popup]); // run when popup changes
+  }, [popup]);
 
   useEffect(() => {
     const getCourses = async () => {
@@ -118,6 +118,12 @@ function DashboardTeacher() {
     getCourses();
   }, []);
 
+  const formatTime = (timeInMinutes) => {
+    const hours = Math.floor(timeInMinutes / 60);
+    const minutes = timeInMinutes % 60;
+    return `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+  };
+
   return (
     <>
       <div className="m-5 ml-60 text-white flex flex-col gap-10">
@@ -142,55 +148,61 @@ function DashboardTeacher() {
         {/* Content based on activeTab */}
         {activeTab === 'Details' && (
           <div className="flex flex-wrap gap-20">
-            <div className="flex flex-col gap-6">
-              <p>Name: <span className="text-black font-semibold">{data.Firstname} {data.Lastname}</span></p>
-              <p>Email: <span className="text-black font-semibold">{data.Email}</span></p>
-              <p>Phone: <span className="text-black font-semibold">{Tdec?.Phone}</span></p>
-              <p>Address: <span className="text-black font-semibold">{Tdec?.Address}</span></p>
-              <p>Experience: <span className="text-black font-semibold">{Tdec?.Experience} years</span></p>
+            <div className="flex flex-col gap-6 bg-white p-6 rounded-lg shadow-md text-black">
+              <h2 className="text-2xl font-bold mb-4">Teacher Information</h2>
+              <p className="border-b pb-2">Name: <span className="font-semibold">{data.Firstname} {data.Lastname}</span></p>
+              <p className="border-b pb-2">Email: <span className="font-semibold">{data.Email}</span></p>
+              <p className="border-b pb-2">Phone: <span className="font-semibold">{Tdec?.Phone}</span></p>
+              <p className="border-b pb-2">Address: <span className="font-semibold">{Tdec?.Address}</span></p>
+              <p>Experience: <span className="font-semibold">{Tdec?.Experience} years</span></p>
             </div>
 
-            <div className="flex flex-col gap-5">
-              <p className="bg-[#1671D8] py-2 px-4 w-fit rounded-md font-semibold">
-                Courses
-              </p>
+            <div className="flex flex-col gap-5 w-full max-w-3xl">
+              <div className="bg-white p-6 rounded-lg shadow-md text-black">
+                <h2 className="text-2xl font-bold mb-4">Courses</h2>
 
-              {courses.length === 0 ? (
-                <p className="text-black font-medium">No course found.</p>
-              ) : (
-                courses.filter((course) => course.isapproved).map((course) => (
-                  <p key={course._id} className="py-2 px-4 rounded-lg w-fit bg-gray-100 text-black">
-                    {course.coursename}:{" "}
-                    <span className="font-semibold">
-                      {"[ "}
-                      {course.schedule.map(days => (
-                        `${daysOfWeek[days.day]} ${Math.floor(days.starttime / 60)}:${days.starttime % 60 === 0 ? "00" : days.starttime % 60} - ${Math.floor(days.endtime / 60)}:${days.endtime % 60 === 0 ? "00" : days.endtime % 60}`
-                      )).join(", ")}
-                      {" ]"}
-                    </span>
-                    <span className="text-[#1671D8] font-bold">
-                      {" => "} Rs. {price[course.coursename]} per student / per month
-                    </span>
-                  </p>
-                ))
-              )}
+                {courses.length === 0 ? (
+                  <p className="font-medium">No course found.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {courses.filter((course) => course.isapproved).map((course) => (
+                      <div key={course._id} className="border-b pb-4 last:border-b-0">
+                        <p className="font-bold text-lg mb-2 capitalize">{course.coursename}:</p>
+                        <p className="text-gray-700 mb-1">
+                          <span className="font-medium">
+                            {"[ "}
+                            {course.schedule.map((days, index) => (
+                              <span key={index}>
+                                {daysOfWeek[days.day]} {formatTime(days.starttime)} - {formatTime(days.endtime)}
+                                {index < course.schedule.length - 1 ? ", " : ""}
+                              </span>
+                            ))}
+                            {" ]"}
+                          </span>
+                        </p>
+                        <p className="text-[#1671D8] font-bold">
+                          Rs. {price[course.coursename]} per student / per month
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-
-            <div className="ml-28"></div>
           </div>
         )}
 
         {activeTab === 'Remuneration' && (
-          <div className="text-black text-xl">
-            <p>Balance: <span className="font-semibold text-[#1671D8]">Rs. {amount}</span></p>
+          <div className="bg-white p-6 rounded-lg shadow-md text-black w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-6">Balance Information</h2>
+            <p className="text-xl mb-4">Balance: <span className="font-semibold text-[#1671D8]">Rs. {amount}</span></p>
 
             <button
               onClick={() => setPopup(true)}
-              className="bg-[#1671D8] hover:bg-[#145db2] mt-6 rounded-md text-white font-semibold px-4 py-2 w-[200px] text-center h-20"
+              className="bg-[#1671D8] hover:bg-[#145db2] mt-6 rounded-md text-white font-semibold px-6 py-3 w-full text-center transition-colors"
             >
               Withdraw Balance
             </button>
-
           </div>
         )}
 

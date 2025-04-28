@@ -137,16 +137,30 @@ function AddClass({ onClose }) {
         <div className='absolute w-9 h-9 bg-[#E2B659] rounded-xl cursor-pointer flex items-center justify-center m-2' onClick={onClose}>✖️</div>
         
         <div className='flex justify-center mt-5 gap-10 border-b-2 py-5'>
-          <p className='text-2xl'>Create next class</p>
-          <select value={CourseId} onChange={(e) => setCourseId(e.target.value)} className='text-gray-900 rounded-md w-28 px-2 border-0 outline-0'>
-            {courses && (
-              courses.filter((course) => course.isapproved)
-              .map((course) => (
-                <option key={course._id} value={course._id}>{course.coursename.toUpperCase()} {'['} {course.schedule.map(day => DAY[day.day]).join(', ')} {']'}</option>
-              ))
-            )}
-          </select>
-        </div>
+  {courses.filter((course) => course.isapproved).length > 0 ? (
+    <>
+      <p className='text-2xl'>Create next class</p>
+      <select
+        value={CourseId}
+        onChange={(e) => setCourseId(e.target.value)}
+        className='text-gray-900 rounded-md w-40 px-2 py-1 border-0 outline-0'
+      >
+        {courses.filter((course) => course.isapproved).map((course) => (
+          <option key={course._id} value={course._id}>
+            {course.coursename.toUpperCase()} {'['} {course.schedule.map(day => DAY[day.day]).join(', ')} {']'}
+          </option>
+        ))}
+      </select>
+    </>
+  ) : (
+    <div className='text-center'>
+      <p className='text-2xl text-red-500 font-semibold animate-pulse'>
+        No course is approved by admin. Please wait...
+      </p>
+    </div>
+  )}
+</div>
+
 
         <div className='flex items-center justify-around my-20 mx-5'>
 
