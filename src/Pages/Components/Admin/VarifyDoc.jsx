@@ -6,6 +6,7 @@ function VarifyDoc() {
   const [data, setData] = useState(null);
   const navigator = useNavigate();
   const [value, setValue] = useState("");
+  const [previewImage, setPreviewImage] = useState(null); // 👈 For full image preview
 
   const handleMessage = (event) => {
     setValue(event.target.value);
@@ -13,16 +14,14 @@ function VarifyDoc() {
 
   const Approval = async (id, type, approve, email) => {
     try {
-      const data = {
+      const bodyData = {
         Isapproved: approve,
         remarks: value,
         email: email,
       };
 
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_BASE_URL
-        }/api/admin/${adminID}/approve/${type}/${id}`,
+      await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/admin/${adminID}/approve/${type}/${id}`,
         {
           method: "POST",
           mode: "cors",
@@ -30,7 +29,7 @@ function VarifyDoc() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify(bodyData),
         }
       );
 
@@ -44,9 +43,7 @@ function VarifyDoc() {
     const getData = async () => {
       try {
         const docData = await fetch(
-          `${
-            import.meta.env.VITE_API_BASE_URL
-          }/api/admin/${adminID}/documents/${type}/${ID}`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/admin/${adminID}/documents/${type}/${ID}`,
           {
             method: "GET",
             mode: "cors",
@@ -55,7 +52,6 @@ function VarifyDoc() {
         );
         const response = await docData.json();
         setData(response.data);
-        console.log(response.data);
       } catch (err) {
         console.log(err.message);
       }
@@ -63,233 +59,143 @@ function VarifyDoc() {
     getData();
   }, []);
 
+  const renderUserDetails = () => {
+    const user = type === "student" ? data?.theStudent : data?.theTeacher;
+    const docs = type === "student" ? data?.studentDocs : data?.teacherDocs;
+
+    return (
+      <>
+        <div className="flex flex-col items-center justify-center mt-5 space-y-3 text-gray-300">
+          <p className="text-lg sm:text-xl font-semibold">
+            Full Name: {user.Firstname} {user.Lastname}
+          </p>
+          <p className="text-lg sm:text-xl font-semibold">Phone: {docs.Phone}</p>
+          {type === "student" ? (
+            <p className="text-lg sm:text-xl font-semibold">
+              Highest Education: {docs.Highesteducation}
+            </p>
+          ) : (
+            <p className="text-lg sm:text-xl font-semibold">
+              Experience: {docs.Experience} years
+            </p>
+          )}
+          <p className="text-lg sm:text-xl font-semibold">Address: {docs.Address}</p>
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-8 mt-10 px-4">
+          {type === "student" && (
+            <>
+              {renderDocCard(docs.Secondary, "10th Marksheet", docs.SecondaryMarks)}
+              {renderDocCard(docs.Higher, "12th Marksheet", docs.HigherMarks)}
+              {renderDocCard(docs.Aadhaar, "Aadhar Card")}
+            </>
+          )}
+          {type === "teacher" && (
+            <>
+              {renderDocCard(docs.Secondary, "10th Marksheet", docs.SecondaryMarks)}
+              {renderDocCard(docs.Higher, "12th Marksheet", docs.HigherMarks)}
+              {renderDocCard(docs.UG, "U.G. Marksheet", docs.UGmarks)}
+              {renderDocCard(docs.PG, "P.G. Marksheet", docs.PGmarks)}
+              {renderDocCard(docs.Aadhaar, "Aadhar Card")}
+            </>
+          )}
+        </div>
+
+        <div className="flex flex-col items-center gap-5 my-10 px-4">
+          <textarea
+            value={value}
+            onChange={handleMessage}
+            className="w-full max-w-md h-40 p-4 text-gray-900 rounded-lg shadow focus:outline-none"
+            placeholder="Write reason for rejecting application..."
+          />
+          <div className="flex flex-wrap justify-center gap-8 mt-5">
+            {["approved", "rejected", "reupload"].map((status) => (
+              <button
+                key={status}
+                onClick={() => Approval(user._id, type, status, user.Email)}
+                className={`px py-2 rounded-md text-lg font-bold text-white transition-transform transform hover:scale-105 ${
+                  status === "approved"
+                    ? "bg-green-600 hover:bg-green-800"
+                    : status === "rejected"
+                    ? "bg-red-600 hover:bg-red-800"
+                    : "bg-blue-600 hover:bg-blue-800"
+                }`}
+              >
+                {status.charAt(0).toUpperCase() + status.slice(1)}!
+              </button>
+            ))}
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  const renderDocCard = (imgSrc, title, marks) => (
+    <div className="flex flex-col items-center bg-[#1f2937] rounded-lg shadow-lg p-4 w-72 cursor-pointer">
+      <img
+        src={imgSrc}
+        alt={title}
+        className="rounded-md object-cover h-48 w-full hover:scale-105 transition-transform"
+        onClick={() => setPreviewImage(imgSrc)} // 👈 Open image preview on click
+      />
+      <h3 className="text-white mt-3 font-semibold text-center">{title}</h3>
+      {marks && (
+        <p className="text-[#8DE855] mt-1 text-center">
+          Marks: {marks}%
+        </p>
+      )}
+    </div>
+  );
+
   return (
-    <>
-      <nav className="h-16 sm:h-20 md:h-24 lg:h-24  w-full bg-[#042439] flex justify-between items-center px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-        <div className="flex items-center">
-          <h1
-            onClick={() => navigator(`/admin/${adminID}`)}
-            className="text-lg sm:text-xl md:text-2xl lg:text-3xl  text-blue-700 font-bold font-mono ml-2"
-          >
-            ◀ Back
-          </h1>
-        </div>
-        <div>
-          <h2 className="text-2xl text-white font-bold">Document Details</h2>
-        </div>
-        <div className="flex items-center">
-          <button
-            onClick={() => navigator("/")}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md"
-          >
-            Logout
-          </button>
-        </div>
+    <div className="min-h-screen bg-[#0e1a2b] pb-20 relative">
+      <nav className="h-16 sm:h-20 w-full bg-[#042439] flex justify-between items-center px-6 sm:px-10 md:px-16">
+        <h1
+          onClick={() => navigator(`/admin/${adminID}`)}
+          className="text-xl sm:text-2xl text-blue-400 font-bold cursor-pointer hover:underline"
+        >
+          ◀ Back
+        </h1>
+        <h2 className="text-2xl sm:text-3xl text-white font-bold">
+          Document Details
+        </h2>
+        <button
+          onClick={() => navigator("/")}
+          className="bg-blue-500 hover:bg-blue-700 transition px-4 py-2 rounded-lg text-white font-semibold"
+        >
+          Logout
+        </button>
       </nav>
 
-      {type === "student" && data && data.theStudent && (
-        <>
-          <div className="flex gap-10 text-gray-200 justify-center mt-5 text-[1.3rem]">
-            <p>
-              Full Name : {data.theStudent.Firstname} {data.theStudent.Lastname}
-            </p>
-            <p>Phone No : {data.studentDocs.Phone}</p>
-            <p>Highest Education : {data.studentDocs.Highesteducation}</p>
-            <p>Address : {data.studentDocs.Address}</p>
-          </div>
-
-          <div className="flex mt-10 justify-center gap-20 flex-wrap text-gray-200  font-bold">
-            <div className="m-5 flex flex-col gap-3">
-              <img
-                src={data.studentDocs.Secondary}
-                alt="Secondary"
-                width={500}
-              />
-              <p>
-                10th Marksheet{" "}
-                <span className="text-[#8DE855]">
-                  : {data.studentDocs.SecondaryMarks}%
-                </span>
-              </p>
-            </div>
-            <div className="m-5 flex flex-col gap-3">
-              <img src={data.studentDocs.Higher} alt="Secondary" width={500} />
-              <p>
-                12th Marksheet{" "}
-                <span className="text-[#8DE855]">
-                  : {data.studentDocs.HigherMarks}%
-                </span>
-              </p>
-            </div>
-            <div className="m-5 flex flex-col gap-3">
-              <img src={data.studentDocs.Aadhaar} alt="Secondary" width={500} />
-              <p>Aadhar Card </p>
-            </div>
-            <div className="flex items-end mb-10 flex-col gap-10">
-              <textarea
-                value={value}
-                onChange={handleMessage}
-                className="w-96 h-60 mt-6 text-black p-5"
-                placeholder="Write reason for rejecting application ..."
-              />
-              <div className="flex items-center gap-3">
-                <div
-                  className="px-5 py-1  bg-green-600 text-lg font-bold text-white ring-1 ring-inset ring-white rounded-lg hover:scale-95 hover:bg-green-900"
-                  onClick={() =>
-                    Approval(
-                      data.theStudent._id,
-                      "student",
-                      "approved",
-                      data.theStudent.Email
-                    )
-                  }
-                >
-                  Approve !
-                </div>
-                <div
-                  className="px-5 py-1  bg-red-600 text-lg font-bold text-white ring-1   ring-inset ring-white rounded-lg hover:scale-95 hover:bg-red-900"
-                  onClick={() =>
-                    Approval(
-                      data.theStudent._id,
-                      "student",
-                      "rejected",
-                      data.theStudent.Email
-                    )
-                  }
-                >
-                  Reject !
-                </div>
-
-                <div
-                  className="px-5 py-1  bg-blue-600 text-lg font-bold text-white ring-1   ring-inset ring-white rounded-lg hover:scale-95 hover:bg-blue-900"
-                  onClick={() =>
-                    Approval(
-                      data.theStudent._id,
-                      "student",
-                      "reupload",
-                      data.theStudent.Email
-                    )
-                  }
-                >
-                  Reupload !
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
+      {data ? renderUserDetails() : (
+        <div className="text-white text-center mt-20 text-xl">
+          Loading...
+        </div>
       )}
 
-      {type === "teacher" && data && data.theTeacher && (
-        <>
-          <div className="flex gap-10 text-gray-200 justify-center mt-5 text-[1.3rem]">
-            <p>
-              Full Name : {data.theTeacher.Firstname} {data.theTeacher.Lastname}
-            </p>
-            <p>Phone No : {data.teacherDocs.Phone}</p>
-            <p>Experience : {data.teacherDocs.Experience} years</p>
-            <p>Address : {data.teacherDocs.Address}</p>
-          </div>
-
-          <div className="flex mt-10 justify-center gap-20 flex-wrap text-gray-200 font-bold">
-            <div className="m-5 flex flex-col gap-3">
-              <img
-                src={data.teacherDocs.Secondary}
-                alt="Secondary"
-                width={500}
-              />
-              <p>
-                10th Marksheet{" "}
-                <span className="text-[#8DE855]">
-                  : {data.teacherDocs.SecondaryMarks}%
-                </span>
-              </p>
-            </div>
-            <div className="m-5 flex flex-col gap-3">
-              <img src={data.teacherDocs.Higher} alt="Secondary" width={500} />
-              <p>
-                12th Marksheet{" "}
-                <span className="text-[#8DE855]">
-                  : {data.teacherDocs.HigherMarks}%
-                </span>
-              </p>
-            </div>
-            <div className="m-5 flex flex-col gap-3">
-              <img src={data.teacherDocs.UG} alt="Secondary" width={500} />
-              <p>
-                U.G. Marksheet{" "}
-                <span className="text-[#8DE855]">
-                  : {data.teacherDocs.UGmarks}
-                </span>
-              </p>
-            </div>
-            <div className="m-5 flex flex-col gap-3">
-              <img src={data.teacherDocs.PG} alt="Secondary" width={500} />
-              <p>
-                P.G. Marksheet{" "}
-                <span className="text-[#8DE855]">
-                  : {data.teacherDocs.PGmarks}
-                </span>
-              </p>
-            </div>
-            <div className="m-5 flex flex-col gap-3">
-              <img src={data.teacherDocs.Aadhaar} alt="Secondary" width={500} />
-              <p>Aadhar Card </p>
-            </div>
-            <div className="flex items-end mb-10 flex-col gap-10">
-              <textarea
-                value={value}
-                onChange={handleMessage}
-                className="w-96 h-60 mt-6 text-black p-5"
-                placeholder="Write reason for rejecting application ..."
-              />
-
-              <div className="flex items-center gap-3">
-                <div
-                  className="px-5 py-1  bg-green-600 text-lg font-bold text-white ring-1 ring-inset ring-white rounded-lg hover:scale-95 hover:bg-green-900"
-                  onClick={() =>
-                    Approval(
-                      data.theTeacher._id,
-                      "teacher",
-                      "approved",
-                      data.theTeacher.Email
-                    )
-                  }
-                >
-                  Approve !
-                </div>
-                <div
-                  className="px-5 py-1  bg-red-600 text-lg font-bold text-white ring-1   ring-inset ring-white rounded-lg hover:scale-95 hover:bg-red-900"
-                  onClick={() =>
-                    Approval(
-                      data.theTeacher._id,
-                      "teacher",
-                      "rejected",
-                      data.theTeacher.Email
-                    )
-                  }
-                >
-                  Reject !
-                </div>
-
-                <div
-                  className="px-5 py-1  bg-blue-600 text-lg font-bold text-white ring-1   ring-inset ring-white rounded-lg hover:scale-95 hover:bg-blue-900"
-                  onClick={() =>
-                    Approval(
-                      data.theTeacher._id,
-                      "teacher",
-                      "reupload",
-                      data.theTeacher.Email
-                    )
-                  }
-                >
-                  Reupload !
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
+      {/* Full Screen Image Modal */}
+      {previewImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+          onClick={() => setPreviewImage(null)}
+        >
+          <img
+            src={previewImage}
+            alt="Full Preview"
+            className="max-h-[90%] max-w-[90%] object-contain rounded-lg"
+          />
+          <button
+            className="absolute top-5 right-5 bg-red-500 hover:bg-red-700 text-white p-2 rounded-full text-xl"
+            onClick={(e) => {
+              e.stopPropagation(); // Don't trigger outside click
+              setPreviewImage(null);
+            }}
+          >
+            ✕
+          </button>
+        </div>
       )}
-    </>
+    </div>
   );
 }
 
