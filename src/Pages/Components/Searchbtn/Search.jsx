@@ -3,6 +3,7 @@ import "./Search.css";
 import { useParams } from "react-router-dom";
 import logo from "../../Images/logo.svg";
 import Success from "./Success";
+import StripeCheckout from "../Stripe/StripeCheckout";
 
 function Search() {
   const [data, setData] = useState("");
@@ -14,11 +15,22 @@ function Search() {
   const [openTM, setOpenTM] = useState(false);
   const [Tdec, setTeacherDetails] = useState(null);
   const [tname, setTname] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+
+  console.log("selectedCourse", selectedCourse);
 
   const closePopup = () => {
     setPopup(false);
     window.location.reload();
   };
+
+  const handleEnrollClick = (course) => {
+    setSelectedCourse(course);
+    setShowModal(true);
+  };
+
+  console.log("selectedCourse", selectedCourse);
 
   const openTeacherDec = async (id, fname, lname, sub) => {
     setTname({ fname, lname, sub });
@@ -41,43 +53,45 @@ function Search() {
     setOpenTM(true);
   };
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const response = await fetch(
-          `${
-            import.meta.env.VITE_API_BASE_URL
-          }/api/course/student/${ID}/enrolled`,
-          {
-            method: "GET",
-            mode: "cors",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
+  const getData = async () => {
+    try {
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/api/course/student/${ID}/enrolled`,
+        {
+          method: "GET",
+          mode: "cors",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
+      );
 
-        const user = await response.json();
-        setCourseID(user.data);
-        console.log(user.data);
-        setIdArray((prevIdArray) => [
-          ...prevIdArray,
-          ...user.data.map((res) => res._id),
-        ]);
-        // Using a callback in setIdArray to ensure you're working with the most up-to-date state
-      } catch (error) {
-        console.log(error.message);
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
       }
-    };
+
+      const user = await response.json();
+      setCourseID(user.data);
+      console.log(user.data);
+      setIdArray((prevIdArray) => [
+        ...prevIdArray,
+        ...user.data.map((res) => res._id),
+      ]);
+      // Using a callback in setIdArray to ensure you're working with the most up-to-date state
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  useEffect(() => {
+   
     getData();
   }, []);
 
-  console.log("course", course)
+  console.log("course", course);
 
   const GetALLCourses = async () => {
     const Data = await fetch(
@@ -297,7 +311,6 @@ function Search() {
     }
   };
 
-
   const filteredCourses = course.filter((courseItem) =>
     courseItem.coursename.toLowerCase().includes(data.toLowerCase())
   );
@@ -317,7 +330,7 @@ function Search() {
           onChange={(e) => setData(e.target.value)}
         />
       </div>
-      <div className="overflow-auto">
+      <div className="overflow-auto flex flex-wrap gap-4 justify-center items-center ">
         {filteredCourses.length > 0 ? (
           filteredCourses.map((Data) => (
             <div
@@ -360,7 +373,9 @@ function Search() {
                     </div>
                   ) : Data.enrolledStudent.length < 20 ? (
                     <div
-                      onClick={() => handleEnroll(Data.coursename, Data._id)}
+                      onClick={() => {
+                        handleEnrollClick(Data);
+                      }}
                       className="bg-blue-900 text-white py-2 px-4 rounded-lg cursor-pointer hover:bg-blue-700 transition-all duration-200"
                     >
                       Enroll Now
@@ -378,6 +393,17 @@ function Search() {
           <p className="text-center text-gray-500 mt-6">No courses found</p>
         )}
       </div>
+
+      {showModal && selectedCourse && (
+        <StripeCheckout
+          courseID={selectedCourse._id}
+          courseName={selectedCourse.coursename}
+          fees={selectedCourse.price}
+          studentID={ID}
+          onClose={() => setShowModal(false)}
+          fetchData={getData}
+        />
+      )}
 
       {popup && <Success onClose={closePopup} />}
     </>

@@ -13,6 +13,8 @@ function TeacherClasses() {
   const [Classes, setClasses] = useState([]);
   const [editClassData, setEditClassData] = useState(null); // NEW
 
+   console.log("Classes", Classes)
+
   useEffect(() => {
     const getData = async () => {
       try {
@@ -129,10 +131,11 @@ function TeacherClasses() {
         <br />
         <div>
           {Classes.length > 0 && (
-            <div className="w-[50%] px-10 mt-10">
+            <div className="w-[100%] px-10 mt-10">
               <h2 className="text-2xl text-white font-bold mb-6">
                 📚 All Classes by Course
               </h2>
+              <div className="flex gap-3 w-full flex-wrap">
               {Classes.map((course) => (
                 <div
                   key={course._id}
@@ -141,6 +144,17 @@ function TeacherClasses() {
                   <h3 className="text-xl font-semibold text-[#1671D8] mb-4">
                     {course.coursename}
                   </h3>
+                  <div>
+                    {course.isapproved ? (
+                      <span className="text-green-500 font-semibold">
+                        Approved
+                        </span>
+                        ) : (
+                          <span className="text-red-500 font-semibold">
+                            Not Approved
+                            </span>
+                            )}
+                  </div>
 
                   {course.liveClasses && course.liveClasses.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
@@ -204,6 +218,7 @@ function TeacherClasses() {
                   )}
                 </div>
               ))}
+              </div>
             </div>
           )}
         </div>
