@@ -14,7 +14,7 @@ function Popup({ onClose, subject, existingCourse }) {
 
   const addCourse = async () => {
     if (!desc) return alert('Fill the description.');
-    if (price !== 0 && price < 300) {
+    if (price == 0 || price < 300) {
     alert("Price must be either Free (0) or at least 300.");
     return;
   }
