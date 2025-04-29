@@ -1,89 +1,204 @@
-import React,{ useEffect, useState } from 'react'
-import Camera from '../Images/Camera.png'
-import Clock from '../Images/Clock.png'
-import { NavLink, useParams } from 'react-router-dom'
+import React, { useEffect, useState } from "react";
+import { NavLink, useParams } from "react-router-dom";
+import YouTube from "react-youtube";
 
 function StudentClasses() {
-    const { ID } = useParams();
-    const [data, setdata] = useState([]);
+  const { ID } = useParams();
+  const [data, setData] = useState(null);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [selectedClass, setSelectedClass] = useState(null);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const getData = async () => {
-          try {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/classes/student/${ID}`, {
-              method: 'GET',
-              credentials: "include",
-              cors: "include",
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            });
-    
-            if (!response.ok) {
-              throw new Error('Failed to fetch data');
-            }
-    
-            const user = await response.json();
-            setdata(user.data.classes[0].liveClasses);
-            console.log(user.data.classes[0].liveClasses);
-
-          } catch (error) {
-            setError(error.message)
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const response = await fetch(
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/api/course/classes/student/${ID}`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
           }
-        };
-        getData();
-    },[ID]);
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+
+        const result = await response.json();
+        setData(result.data);
+        // Set the first course as selected by default
+        if (result.data.courses.length > 0) {
+          setSelectedCourse(result.data.courses[0]);
+        }
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+    getData();
+  }, [ID]);
+
+  const extractVideoId = (url) => {
+    // The link in the data is just "v=ID", so we'll split on '=' and take the second part
+    return url.split("=")[1];
+  };
+
+  const handleClassSelect = (classItem) => {
+    setSelectedClass(classItem);
+  };
+
+  const opts = {
+    height: "390",
+    width: "640",
+    playerVars: {
+      autoplay: 0,
+    },
+  };
+
+  if (error) {
+    return <div className="text-red-500 p-4">Error: {error}</div>;
+  }
+
+  if (!data) {
+    return <div className="text-white p-4">Loading...</div>;
+  }
 
   return (
-    <div className='ml-60 mt-20 text-white flex justify-between mr-60'>
-        <h1 className='absolute bottom-72 left-60 text-[#1671D8] text-2xl mt-4 mb-4 font-semibold'>Weekly Schedule</h1>
+    <div className="ml-60 mt-20 text-white mr-10 p-6">
+      <h1 className="text-3xl font-bold mb-8 text-[#1671D8]">My Courses</h1>
 
-        <div className='h-[17rem] w-[30rem] overflow-auto '>
-        {data.filter(clas => {
-          const classDate = new Date(clas.date.slice(0, 10));
-          const today = new Date();
-          const oneWeekFromNow = new Date(today);
-          oneWeekFromNow.setDate(today.getDate() + 7);
-
-          return classDate >= today && classDate <= oneWeekFromNow;
-        }).map((clas) => (
-        <div key={clas.timing} className='flex items-center mb-5'>
-        <img src="https://www.pngall.com/wp-content/uploads/5/Profile-Male-PNG.png" alt="profile_img" width={30} />
-        <div className='ml-5 mr-10 font-bold'>
-            <p className=' text-lg'>{clas.coursename}
-                <span className='text-black text-sm ml-3'>
-                    {clas.date.slice(0, 10)}  {Math.floor(clas.timing / 60)}:{clas.timing % 60 === 0 ? "00" : clas.timing % 60}
-                </span>
-            </p>
-            <span className='text-blue-500 text-sm ml-3'>{clas.title.slice(0, 35)} ...</span>
-        </div>
-        <p className='text-sm bg-[#4E84C1] p-2 rounded-lg'>{clas.status}</p>
-    </div>
-))}
-
-        </div>
-        
-          <NavLink to={data[0]?.link} target='_blank'>
-            <div className='bg-white p-5 h-52 cursor-pointer rounded-lg text-black'>
-                <div className='flex gap-3 items-center mb-5 mt-2'>
-                    <img src={Clock} alt="clock" width={50} />
-                    <span className='text-[#4E84C1] text-2xl font-semibold'>{typeof data[0]?.date === 'string' ? data[0]?.date.slice(0,10) : ''}</span> 
-                    <span className='text-[#018280] text-2xl ml-2'>
-                        {typeof data[0]?.timing === 'number' ? `${Math.floor(data[0]?.timing / 60)}:${data[0]?.timing % 60 === 0 ?"00":data[0]?.timing % 60}` :''}
-                    </span>
-                </div>
-                <div className='flex gap-12 items-center'>
-                    <div className='ml-3'>
-                        <p>Your next Class</p>
-                        <p className='text-[#018280] text-3xl font-semibold'>{data[0]?.coursename}</p>
-                        <p className=' text-light-blue-700'>{data[0]?.title.slice(0,25)} ...</p>
-                    </div>
-                    <img src={Camera} alt="Camera" width={70}/>
-                </div>
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Courses List */}
+        {!selectedClass && (
+          <div className="w-full lg:w-1/3">
+            <div className="bg-[#1E293B] rounded-lg p-4 shadow-lg">
+              <h2 className="text-xl font-semibold mb-4 border-b pb-2">
+                Your Courses
+              </h2>
+              <div className="space-y-4">
+                {data.courses.map((course) => (
+                  <div
+                    key={course._id}
+                    className={`p-3 rounded-lg cursor-pointer transition-all ${
+                      selectedCourse?._id === course._id
+                        ? "bg-[#1671D8]"
+                        : "bg-[#2D3748] hover:bg-[#3B4758]"
+                    }`}
+                    onClick={() => setSelectedCourse(course)}
+                  >
+                    <h3 className="font-bold">{course.coursename}</h3>
+                    <p className="text-sm text-gray-300">
+                      {course.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </NavLink>
+          </div>
+        )}
+
+        {/* Classes List */}
+        {!selectedClass && (
+          <div className="w-full lg:w-1/3">
+            {selectedCourse && (
+              <div className="bg-[#1E293B] rounded-lg p-4 shadow-lg">
+                <h2 className="text-xl font-semibold mb-4 border-b pb-2">
+                  Classes
+                </h2>
+                <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                  {selectedCourse.liveClasses.map((classItem, index) => (
+                    <div
+                      key={index}
+                      className={`p-3 rounded-lg cursor-pointer transition-all ${
+                        selectedClass?.title === classItem.title
+                          ? "bg-[#1671D8]"
+                          : "bg-[#2D3748] hover:bg-[#3B4758]"
+                      }`}
+                      onClick={() => handleClassSelect(classItem)}
+                    >
+                      <div className="flex items-start gap-3">
+                        <img
+                          src={classItem.thumbnail}
+                          alt="Class thumbnail"
+                          className="w-16 h-16 object-cover rounded"
+                        />
+                        <div>
+                          <h3 className="font-semibold">{classItem.title}</h3>
+                          <p className="text-xs text-gray-300 line-clamp-2">
+                            {classItem.description}
+                          </p>
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full ${
+                              classItem.status === "upcoming"
+                                ? "bg-yellow-500"
+                                : "bg-green-500"
+                            } text-white mt-1 inline-block`}
+                          >
+                            {classItem.status}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Class Details and Video Player */}
+        <div className="w-[80%] ">
+          {selectedClass ? (
+            <div className="bg-[#1E293B]  flex-col justify-center rounded-lg p-4 shadow-lg">
+              <div
+                className="my-3 cursor-pointer"
+                onClick={() => setSelectedClass(null)}
+              >
+                ⏪Back
+              </div>
+              <h2 className="text-xl font-semibold mb-4 border-b pb-2">
+                Class Details
+              </h2>
+              <div className="space-y-4 flex justify-center flex-col">
+                <div className="aspect-w-16 aspect-h-9">
+                  <YouTube
+                    videoId={extractVideoId(selectedClass.link)}
+                    opts={opts}
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold">{selectedClass.title}</h3>
+                  <p className="text-sm text-gray-300 mt-2">
+                    {selectedClass.description}
+                  </p>
+                  <div className="mt-4">
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        selectedClass.status === "upcoming"
+                          ? "bg-yellow-500"
+                          : "bg-green-500"
+                      } text-white`}
+                    >
+                      {selectedClass.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-[#1E293B] rounded-lg p-8 text-center shadow-lg flex items-center justify-center h-full">
+              <p className="text-gray-400">Select a class to view details</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
-  )
+  );
 }
 
-export default StudentClasses
+export default StudentClasses;

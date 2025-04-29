@@ -1,190 +1,183 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import DateTime from './DateTime';
+import { uploadImageToCloudinary } from '../../../Utils/Clodinary';
 
-function AddClass({ onClose }) {
+function AddClass({ onClose , editData }) {
   const { ID } = useParams();
   const [courses, setCourses] = useState([]);
-  const [error, setError] = useState([]);
-  const [date, setDate] = useState("");
-  const [link, setLink] = useState("");
-  const [note, setNote] = useState("");
   const [CourseId, setCourseId] = useState('');
-  const [allowedDays, setCurrData] = useState([]);
-
-  const DAY = [
-    "Sunday",    
-    "Monday",    
-    "Tuesday",   
-    "Wednesday", 
-    "Thursday",  
-    "Friday",    
-    "Saturday"   
-  ];
-  
-  function setToMidnight(dateTimeString) {
-    // Create a new Date object from the input string
-    let date = new Date(dateTimeString);
-    
-    // Extract the time part
-    let hours = date.getUTCHours();
-    let minutes = date.getUTCMinutes();
-    let seconds = date.getUTCSeconds();
-    
-    let totalMinutes = (hours * 60) + minutes;
-    date.setUTCHours(0, 0, 0, 0);
-    let modifiedDateTimeString = date.toISOString();
-    
-    const DATETIME = [totalMinutes, modifiedDateTimeString];
-    
-    return DATETIME;
-  }
+  const [title, setTitle] = useState('');
+  const [link, setLink] = useState('');
+  const [description, setDescription] = useState('');
+  const [thumbnail, setThumbnail] = useState(null);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const getCourses = async () => {
+    if (editData) {
+      setCourseId(editData.courseId);
+      setTitle(editData.title);
+      setDescription(editData.description);
+      setLink(editData.link);
+      setThumbnail(null); // Keep null unless updating image
+    }
+  }, [editData]);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/Teacher/${ID}/enrolled`, {
-          method: 'GET',
           credentials: "include",
-          cors: "include",
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
         });
 
-        // console.log(response);
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-
         const res = await response.json();
+        const approvedCourses = res.data.filter(course => course.isapproved);
 
-        // console.log(res.data);
-        setCourses(res.data);
-        setCourseId(res.data[0]._id);
-      } catch (error) {
-        setError(error.message);
+        setCourses(approvedCourses);
+        if (approvedCourses.length > 0) setCourseId(approvedCourses[0]._id);
+      } catch (err) {
+        setError('Failed to fetch courses');
       }
     };
-    getCourses();
-  }, [ID]); 
 
-  useEffect(() => {
-    const filteredData = courses.filter(course => course._id === CourseId);
-    setCurrData(filteredData[0]?.schedule);
-    // console.log("output:", filteredData[0]?.schedule);
-  }, [CourseId]);
+    fetchCourses();
+  }, [ID]);
+
+
+
+  const handleSubmit = async () => {
+    if (!title || !description) {
+      alert("Title and description are required");
+      return;
+    }
   
-
-  console.log("courses", courses);
-
-  const addCourses = async () => {
-    const currentDate = new Date();
-    const givenDate = new Date(date);
-
-    const modifyDate = setToMidnight(date);
-
-    const data = {
-      title: note,
-      timing: modifyDate[0],
-      date: modifyDate[1],
-      link: link,
-      status: 'upcoming',
-    };
-
-    // console.log("add classes",data)
-
-
-    if (currentDate > givenDate) {
-      alert('choose a valid Date!');
-    } else if (note === '' || date === '' || link === '') {
-      alert('All fields are required!');
-    } else {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/${CourseId}/teacher/${ID}/add-class`, {
-          method: 'POST',
-          credentials: "include",
-          cors: "include",
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        });
-
-        const res = await response.json();
-        alert(res.message);
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-
-        
-        
-
-        if (res.statusCode === 200) {
-          onClose();
-        }
-      } catch (error) {
-        setError(error.message);
+    setLoading(true);
+  
+    try {
+      let imageUrl = editData?.thumbnail || "";
+      if (thumbnail) {
+        imageUrl = await uploadImageToCloudinary(thumbnail);
       }
+  
+      const payload = {
+        title,
+        link,
+        thumbnail: imageUrl,
+        description,
+        status: editData ? editData.status : "upcoming",
+      };
+  
+      const url = editData
+        ? `${import.meta.env.VITE_API_BASE_URL}/api/course/${CourseId}/teacher/${ID}/update-class/${editData._id}`
+        : `${import.meta.env.VITE_API_BASE_URL}/api/course/${CourseId}/teacher/${ID}/add-class`;
+  
+      const method = editData ? "PUT" : "POST";
+  
+      const res = await fetch(url, {
+        method,
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+  
+      const result = await res.json();
+      alert(result.message);
+  
+      if (res.ok) onClose();
+    } catch (err) {
+      setError("Failed to submit class");
+    } finally {
+      setLoading(false);
     }
   };
+  
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center'>
-      <div className='w-[60%] h-[70%] bg-blue-gray-700 text-white rounded-md'>
-        <div className='absolute w-9 h-9 bg-[#E2B659] rounded-xl cursor-pointer flex items-center justify-center m-2' onClick={onClose}>✖️</div>
-        
-        <div className='flex justify-center mt-5 gap-10 border-b-2 py-5'>
-  {courses.filter((course) => course.isapproved).length > 0 ? (
-    <>
-      <p className='text-2xl'>Create next class</p>
-      <select
-        value={CourseId}
-        onChange={(e) => setCourseId(e.target.value)}
-        className='text-gray-900 rounded-md w-40 px-2 py-1 border-0 outline-0'
-      >
-        {courses.filter((course) => course.isapproved).map((course) => (
-          <option key={course._id} value={course._id}>
-            {course.coursename.toUpperCase()} {'['} {course.schedule.map(day => DAY[day.day]).join(', ')} {']'}
-          </option>
-        ))}
-      </select>
-    </>
-  ) : (
-    <div className='text-center'>
-      <p className='text-2xl text-red-500 font-semibold animate-pulse'>
-        No course is approved by admin. Please wait...
-      </p>
-    </div>
-  )}
-</div>
+    <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+      <div className="w-full max-w-2xl bg-white text-gray-900 rounded-lg shadow-lg relative">
+        <button onClick={onClose} className="absolute top-3 right-3 text-lg font-bold text-gray-500 hover:text-red-500">
+          ✖️
+        </button>
 
-
-        <div className='flex items-center justify-around my-20 mx-5'>
-
-          <div className='flex gap-5 text-black'>
-            <label htmlFor="" className='text-xl text-white'>Date & Time:</label>
-            <DateTime setDate={setDate} allowedDays={allowedDays}/>
-          </div>
+        <div className="px-6 py-5 border-b">
+          <h2 className="text-2xl font-semibold">Add New Class</h2>
         </div>
 
-        <div className='m-10 flex items-center justify-center gap-20 mb-20'>
-          <div className='flex gap-5'>
-            <label htmlFor="" className='text-xl'>Link:</label>
-            <input value={link} onChange={(e) => setLink(e.target.value)} type="url" className='border-0 outline-0 text-gray-900 py-1 px-3 rounded-sm' />
+        {courses?.length < 0 ? (
+          <div className="px-6 py-10 text-center text-red-500 font-semibold text-lg">
+            No approved course available. Please wait for admin approval.
           </div>
+        ) : (
+          <>
+            <div className="px-6 py-5 space-y-4">
+              <div>
+                <label className="block font-medium">Select Course:</label>
+                <select
+                  value={CourseId}
+                  onChange={(e) => setCourseId(e.target.value)}
+                  className="w-full border rounded px-3 py-2 mt-1"
+                >
+                  {courses?.map(course => (
+                    <option key={course._id} value={course._id}>
+                      {course.coursename.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          <div className='flex gap-5'>
-            <label htmlFor="" className='text-xl'>Title:</label>
-            <input value={note} onChange={(e) => setNote(e.target.value)} type="text" className='border-0 outline-0 text-gray-900 py-1 px-3 rounded-sm' />
-          </div>
-        </div>
+              <div>
+                <label className="block font-medium">Title:</label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full border rounded px-3 py-2 mt-1"
+                />
+              </div>
 
-        <div className='flex items-center justify-center'>
-          <div onClick={addCourses} className='bg-[#E2B659] w-32 text-center py-2 rounded-sm text-brown-900 text-xl cursor-pointer'>Submit</div>
-        </div>
+              <div>
+                <label className="block font-medium">Description:</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={3}
+                  className="w-full border rounded px-3 py-2 mt-1"
+                ></textarea>
+              </div>
+
+              <div>
+                <label className="block font-medium">YouTube Video ID</label>
+                <input
+                  type="url"
+                  value={link}
+                  onChange={(e) => setLink(e.target.value)}
+                  className="w-full border rounded px-3 py-2 mt-1"
+                />
+              </div>
+
+              <div>
+                <label className="block font-medium">Thumbnail Image:</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setThumbnail(e.target.files[0])}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+
+            <div className="px-6 py-5 flex justify-end border-t">
+              <button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-5 py-2 rounded disabled:opacity-50"
+              >
+             {loading ? "Submitting..." : editData ? "Update Class" : "Add Class"}
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

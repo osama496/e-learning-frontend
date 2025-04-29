@@ -1,204 +1,141 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState } from "react";
+import { useParams } from "react-router-dom";
+import { uploadImageToCloudinary } from "../../../Utils/Clodinary";
 
-function Popup({ onClose, subject }) {
-  const [desc, setDesc] = useState('');
+function Popup({ onClose, subject, existingCourse }) {
+  const [desc, setDesc] = useState(existingCourse?.description || "");
+  const [thumbnailimage, setThumbnailimage] = useState(null); // for new upload
+  const [price, setPrice] = useState(existingCourse?.price || 0);
+  const [course, setCourse] = useState(() => existingCourse?.coursename || subject || "");
   const { ID } = useParams();
-  const dateGap = 3; // 3 hours
+  const [loading, setLoading] = useState(false);
 
-  const [day, setDay] = useState({
-    sun: false,
-    mon: false,
-    tue: false,
-    wed: false,
-    thu: false,
-    fri: false,
-    sat: false,
-  });
-
-  const [course, setCourse] = useState("")
-  const [dayValue, setDayValue] = useState({
-    sun: '',
-    mon: '',
-    tue: '',
-    wed: '',
-    thu: '',
-    fri: '',
-    sat: '',
-  });
-
-  const dayIndex = {
-    sun: 0,
-    mon: 1,
-    tue: 2,
-    wed: 3,
-    thu: 4,
-    fri: 5,
-    sat: 6,
-  };
-
-  const handleCheckboxChange = (dayName) => {
-    setDay((prevDay) => ({ ...prevDay, [dayName]: !prevDay[dayName] }));
-  };
+  console.log("existingCourse",existingCourse)
 
   const addCourse = async () => {
-    const selectedDays = Object.keys(day)
-      .filter((d) => day[d])
-      .map((d) => ({
-        day: dayIndex[d],
-        starttime: dayValue[d] ? convertTimeToMinutes(dayValue[d]) : null,
-        endtime: dayValue[d] ? convertTimeToMinutes(dayValue[d]) + dateGap * 60 : null,
-      }));
-
-    const hasMissingTime = selectedDays.some((d) => d.starttime === null);
-
-    if (hasMissingTime) {
-      alert('Please fill in the time for all selected days.');
-      return;
-    }
-
-    const invalidTimeRange = selectedDays.some((d) => {
-      const startTime = d.starttime;
-      const endTime = d.endtime;
-      if (startTime >= endTime) {
-        alert('Start time must be earlier than end time.');
-        return true;
+    if (!desc) return alert('Fill the description.');
+    if (price <= 0) return alert('Please provide a valid price.');
+  
+    try {
+      setLoading(true);
+      let imageUrl = existingCourse?.thumbnailimage;
+  
+      if (thumbnailimage) {
+        imageUrl = await uploadImageToCloudinary(thumbnailimage);
       }
-      if ((endTime - startTime) > 3 * 60) {
-        alert('End time should not be more than 3 hours after start time.');
-        return true;
+  
+      const payload = {
+        coursename: course.toLowerCase(),
+        description: desc,
+        price,
+        thumbnailimage: imageUrl,
+      };
+  
+      let apiURL;
+      let method;
+  
+      if (existingCourse) {
+        // Edit Mode
+        apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/course/${existingCourse._id}/update/${existingCourse.enrolledteacher}`;
+        method = 'PUT';
+      } else {
+        // Create Mode
+        const courseName = (course || subject).replace(/\s+/g, '');
+        apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/course/${courseName}/create/${ID}`;
+        method = 'POST';
       }
-      return false;
-    });
-
-    if (invalidTimeRange) {
-      return;
+  
+      const response = await fetch(apiURL, {
+        method,
+        credentials: 'include',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      const responseData = await response.json();
+      alert(responseData.message);
+      onClose();
+    } catch (error) {
+      console.error('Error submitting course:', error);
+      alert('Error submitting course. Please try again.');
+    } finally {
+      setLoading(false);
     }
-
-    if (desc === '') {
-      alert('Fill the description.');
-      return;
-    }
-
-    if (selectedDays.length === 0) {
-      alert('pls! select any day and time.');
-      return;
-    }
-
-    onClose();
-
-    const data = {
-      coursename: subject.toLowerCase() || course.toLocaleLowerCase(),
-      description: desc,
-      schedule: selectedDays,
-    };
-
-    console.log(data);
-
-    // Call API
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/course/${course || subject}/create/${ID}`, {
-      method: 'POST',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    const responseData = await response.json();
-    console.log(responseData);
-    alert(responseData.message);
   };
-
-  const convertTimeToMinutes = (time) => {
-    const [hours, minutes] = time.split(':').map(Number);
-    return hours * 60 + minutes;
-  };
-
-  const convertMinutesToTime = (minutes) => {
-    const hours = String(Math.floor(minutes / 60)).padStart(2, '0');
-    const mins = String(minutes % 60).padStart(2, '0');
-    return `${hours}:${mins}`;
-  };
+  
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center'>
-      <div className='bg-[#008280] w-[30rem] h-fit py-4 mt-1 rounded-md'>
+    <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center">
+      <div className="bg-[#008280] w-[30rem] h-fit py-4 mt-1 rounded-md">
         <div
-          className='absolute w-9 h-9 bg-white rounded-xl cursor-pointer flex items-center justify-center m-2'
+          className="absolute w-9 h-9 bg-white rounded-xl cursor-pointer flex items-center justify-center m-2"
           onClick={onClose}
         >
           ✖️
         </div>
-        <div className='text-center my-10 text-white text-3xl font-semibold'>
+        <div className="text-center my-10 text-white text-3xl font-semibold">
           <p>{subject}</p>
         </div>
-        <div className='m-5 flex flex-col gap-4 text-white text-xl'>
+        <div className="m-5 flex flex-col gap-4 text-white text-xl">
           <div>
-            <label htmlFor=''>Coursename: </label>
+            <label>Coursename: </label>
             <input
-              type='text'
-              className='bg-[#32B0AE] p-2 rounded-md w-52 border-0 outline-0'
-              value={course || subject}
+              type="text"
+              className="bg-[#32B0AE] p-2 rounded-md w-52 border-0 outline-0"
+              value={course}
               onChange={(e) => setCourse(e.target.value)}
-              readOnly={!!subject} // Make it read-only if subject is provided
+              
             />
           </div>
 
-          <label>Timing: </label>
-          {Object.keys(day).map((d) => (
-            <div
-              key={d}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-              }}
-            >
-              <input
-                type='checkbox'
-                checked={day[d]}
-                onChange={() => handleCheckboxChange(d)}
-              />
-              <label>{d.charAt(0).toUpperCase() + d.slice(1)}</label>
-              <input
-                className='w-[7rem] rounded-sm text-black placeholder:text-gray pl-2'
-                type='time'
-                placeholder='Start Time'
-                value={dayValue[d]}
-                onChange={(e) =>
-                  setDayValue({ ...dayValue, [d]: e.target.value })
-                }
-              />
-              <input
-                className='w-[7rem] rounded-sm text-black placeholder:text-gray pl-2'
-                type='time'
-                readOnly
-                placeholder='End Time'
-                value={dayValue[d] ? convertMinutesToTime(convertTimeToMinutes(dayValue[d]) + dateGap * 60) : ''}
-              />
-            </div>
-          ))}
-
           <div>
-            <label htmlFor=''>Description: </label>
+            <label>Description: </label>
             <input
-              type='text'
+              type="text"
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
-              className='bg-[#32B0AE] p-2 rounded-md w-52 ml-3 border-0 outline-0'
+              className="bg-[#32B0AE] p-2 rounded-md w-52 ml-3 border-0 outline-0"
+            />
+          </div>
+
+          <div>
+            <label>Thumbnail Image URL: </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setThumbnailimage(e.target.files[0])}
+              className="bg-[#32B0AE] p-2 rounded-md w-52 ml-3 border-0 outline-0"
+            />
+            {existingCourse?.thumbnailimage && !thumbnailimage && (
+              <img
+                src={existingCourse.thumbnailimage}
+                alt="Course thumbnail"
+                className="w-32 h-20 object-cover rounded mt-2"
+              />
+            )}
+          </div>
+
+          <div>
+            <label>Price: </label>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="bg-[#32B0AE] p-2 rounded-md w-52 ml-3 border-0 outline-0"
+              min="0"
             />
           </div>
         </div>
 
-        <div className='flex items-center justify-center mt-7'>
+        <div className="flex items-center justify-center mt-7">
           <span
             onClick={addCourse}
-            className='bg-[#335699] text-white px-10 py-3 rounded-md text-xl cursor-pointer'
+            className="bg-[#335699] text-white px-10 py-3 rounded-md text-xl cursor-pointer"
           >
-            Create Course
+            {loading ? "Wait..." : "Create Course"}
           </span>
         </div>
       </div>
@@ -207,4 +144,3 @@ function Popup({ onClose, subject }) {
 }
 
 export default Popup;
-
