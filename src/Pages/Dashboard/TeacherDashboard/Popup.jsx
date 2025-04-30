@@ -6,69 +6,74 @@ function Popup({ onClose, subject, existingCourse }) {
   const [desc, setDesc] = useState(existingCourse?.description || "");
   const [thumbnailimage, setThumbnailimage] = useState(null); // for new upload
   const [price, setPrice] = useState(existingCourse?.price || 0);
-  const [course, setCourse] = useState(() => existingCourse?.coursename || subject || "");
+  const [course, setCourse] = useState(
+    () => existingCourse?.coursename || subject || ""
+  );
   const { ID } = useParams();
   const [loading, setLoading] = useState(false);
 
-  console.log("existingCourse",existingCourse)
+  console.log("existingCourse", existingCourse);
 
   const addCourse = async () => {
-    if (!desc) return alert('Fill the description.');
-    if (price == 0 || price < 300) {
-    alert("Price must be either Free (0) or at least 300.");
-    return;
-  }
-  
+    if (!desc) return alert("Fill the description.");
+    if (price !== 0 && price < 300) {
+      alert("Price must be either Free (0) or at least 300.");
+      return;
+    }
+
     try {
       setLoading(true);
       let imageUrl = existingCourse?.thumbnailimage;
-  
+
       if (thumbnailimage) {
         imageUrl = await uploadImageToCloudinary(thumbnailimage);
       }
-  
+
       const payload = {
         coursename: course.toLowerCase(),
         description: desc,
         price,
         thumbnailimage: imageUrl,
       };
-  
+
       let apiURL;
       let method;
-  
+
       if (existingCourse) {
         // Edit Mode
-        apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/course/${existingCourse._id}/update/${existingCourse.enrolledteacher}`;
-        method = 'PUT';
+        apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/course/${
+          existingCourse._id
+        }/update/${existingCourse.enrolledteacher}`;
+        method = "PUT";
       } else {
         // Create Mode
-        const courseName = (course || subject).replace(/\s+/g, '');
-        apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/course/${courseName}/create/${ID}`;
-        method = 'POST';
+        const courseName = (course || subject).replace(/\s+/g, "");
+        apiURL = `${
+          import.meta.env.VITE_API_BASE_URL
+        }/api/course/${courseName}/create/${ID}`;
+        method = "POST";
       }
-  
+
       const response = await fetch(apiURL, {
         method,
-        credentials: 'include',
-        mode: 'cors',
+        credentials: "include",
+        mode: "cors",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
-  
+
       const responseData = await response.json();
       alert(responseData.message);
       onClose();
     } catch (error) {
-      console.error('Error submitting course:', error);
-      alert('Error submitting course. Please try again.');
+      console.error("Error submitting course:", error);
+      alert("Error submitting course. Please try again.");
     } finally {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center">
@@ -90,7 +95,6 @@ function Popup({ onClose, subject, existingCourse }) {
               className="bg-[#32B0AE] p-2 rounded-md w-52 border-0 outline-0"
               value={course}
               onChange={(e) => setCourse(e.target.value)}
-              
             />
           </div>
 
@@ -122,14 +126,31 @@ function Popup({ onClose, subject, existingCourse }) {
           </div>
 
           <div>
-            <label>Price: </label>
+            <label className="mr-2">Price: </label>
             <input
               type="number"
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              onChange={(e) => setPrice(Number(e.target.value))}
               className="bg-[#32B0AE] p-2 rounded-md w-52 ml-3 border-0 outline-0"
               min="0"
+              disabled={price === 0}
             />
+            <div className="mt-2 text-sm">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={price === 0}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setPrice(0);
+                    } else {
+                      setPrice(300); // Set default minimum when unchecked
+                    }
+                  }}
+                />
+                Make it Free
+              </label>
+            </div>
           </div>
         </div>
 

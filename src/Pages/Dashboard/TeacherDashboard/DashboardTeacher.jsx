@@ -8,6 +8,8 @@ function DashboardTeacher() {
   const [Tdec, setTeacherDetails] = useState(null);
   const [error, setError] = useState(null);
 
+  console.log("Data", data)
+
   useEffect(() => {
     const fetchTeacherData = async () => {
       try {
@@ -77,8 +79,24 @@ function DashboardTeacher() {
     <div className="ml-60 px-6 py-10 text-white">
       <h1 className="text-3xl font-bold text-white mb-10">Teacher Dashboard</h1>
 
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+  <div className="bg-gradient-to-br from-blue-500 to-blue-700 p-6 rounded-lg shadow-md text-white">
+    <h3 className="text-lg font-semibold">Total Students</h3>
+    <p className="text-3xl font-bold mt-2"> {Array.isArray(data?.enrolledStudent) ? data.enrolledStudent.length : 0}</p>
+  </div>
+
+  <div className="bg-gradient-to-br from-green-500 to-green-700 p-6 rounded-lg shadow-md text-white">
+    <h3 className="text-lg font-semibold">Balance</h3>
+    <p className="text-3xl font-bold mt-2"> {data.Balance || 0}</p>
+  </div>
+
+  <div className="bg-gradient-to-br from-purple-500 to-purple-700 p-6 rounded-lg shadow-md text-white">
+    <h3 className="text-lg font-semibold">Courses</h3>
+    <p className="text-3xl font-bold mt-2">{courses.length}</p>
+  </div>
+</div>
       {/* Profile Section */}
-      <div className="bg-white text-black p-6 rounded-lg shadow-lg mb-10">
+      {/* <div className="bg-white text-black p-6 rounded-lg shadow-lg mb-10">
         <h2 className="text-2xl font-bold mb-4">Teacher Profile</h2>
         <div className="grid md:grid-cols-2 gap-6">
           <p><span className="font-semibold">Name:</span> {data.Firstname} {data.Lastname}</p>
@@ -87,7 +105,7 @@ function DashboardTeacher() {
           <p><span className="font-semibold">Address:</span> {Tdec?.Address || "N/A"}</p>
           <p><span className="font-semibold">Experience:</span> {Tdec?.Experience || "N/A"} years</p>
         </div>
-      </div>
+      </div> */}
 
       {/* Courses Section */}
       <div className="bg-white text-black p-6 rounded-lg shadow-lg">

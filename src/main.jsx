@@ -33,6 +33,8 @@ import ResetPassword from './Pages/ForgetPassword/ResetPassword'
 import { Toaster } from 'react-hot-toast'
 import ResetTeacher from './Pages/ForgetPassword/ResetTeacher'
 import Course from './Pages/Components/Admin/Course'
+import ProfileTeacher from './Pages/Dashboard/TeacherDashboard/ProfileTeacher'
+import ProfileStudent from './Pages/Dashboard/StudentDashboard/ProfileStudent'
 
 
 const router = createBrowserRouter(
@@ -60,16 +62,19 @@ const router = createBrowserRouter(
         <Route path='/Student/Dashboard/:ID/Search' element={<SearchTeacher/>}/>
         <Route path='/Student/Dashboard/:ID/Classes' element={<StudentClasses/>}/>
         <Route path='/Student/Dashboard/:ID/Courses' element={<StudentCourses/>}/>
+        <Route path='/Student/Dashboard/:ID/Profile' element={<ProfileStudent/>}/>
       </Route>
       <Route path='/Teacher/Dashboard/:ID' element={<TeacherLayout/>}>
         <Route path='/Teacher/Dashboard/:ID/Home' element={<DashboardTeacher/>}/>
         <Route path='/Teacher/Dashboard/:ID/Classes' element={<TeacherClasses/>}/>
         <Route path='/Teacher/Dashboard/:ID/Courses' element={<TeacherCourses/>}/>
+        <Route path='/Teacher/Dashboard/:ID/Profile' element={<ProfileTeacher/>}/>
       </Route>
 
       <Route path='/forgetPassword' element={<Forgetpassword/>}/>
       <Route path='/student/forgetPassword/:token' element={<ResetPassword/>}/>
       <Route path='/teacher/forgetPassword/:token' element={<ResetTeacher/>}/>
+     
       
     
       <Route path='*' element={<ErrorPage/>}/>

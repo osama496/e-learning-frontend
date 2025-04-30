@@ -330,12 +330,12 @@ function Search() {
           onChange={(e) => setData(e.target.value)}
         />
       </div>
-      <div className="overflow-auto flex flex-wrap gap-4 justify-center items-center ">
+      <div className="overflow-auto grid md:grid-cols-1 lg:grid-cols-2 gap-6 mx-4 justify-center items-center ">
         {filteredCourses.length > 0 ? (
           filteredCourses.map((Data) => (
             <div
               key={Data._id}
-              className="relative bg-white shadow-lg rounded-lg p-4 mb-6 max-w-xl flex flex-col md:flex-row items-center gap-6 hover:shadow-xl transition-all duration-300"
+              className="relative bg-white shadow-lg rounded-lg p-4 mb-6 max-w-lg flex flex-col md:flex-row items-center gap-6 hover:shadow-xl transition-all duration-300"
             >
               <div className="w-full md:w-1/3">
                 <img
