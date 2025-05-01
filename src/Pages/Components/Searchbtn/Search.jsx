@@ -317,7 +317,7 @@ function Search() {
 
   return (
     <>
-    {search && 
+   
       <div className="search mb-4">
         <img
           src="https://www.figma.com/file/6b4R8evBkii6mI53IA4vSS/image/6c476f454537d7f27cae2b4d0f31e2b59b3020f5"
@@ -331,7 +331,6 @@ function Search() {
           onChange={(e) => setData(e.target.value)}
         />
       </div>
-      }
       <div className="overflow-auto grid md:grid-cols-1 lg:grid-cols-2 gap-6 mx-4 justify-center items-center ">
         {filteredCourses.length > 0 ? (
           filteredCourses.map((Data) => (
