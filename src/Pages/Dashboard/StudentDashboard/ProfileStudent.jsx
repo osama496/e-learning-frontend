@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import Search from '../../Components/Searchbtn/Search';
+import SearchRecomand from '../../Components/Searchbtn/SearchRecomand';
 
 export default function ProfileStudent() {
   const { ID } = useParams();
@@ -112,6 +114,10 @@ export default function ProfileStudent() {
             </button>
           </div>
         )}
+      </div>
+      <h2 className="text-2xl text-white font-bold">Recommendation for You</h2>
+      <div className='mt-[-30px]'>
+      <SearchRecomand/>
       </div>
     </div>
   );

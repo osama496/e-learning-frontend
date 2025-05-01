@@ -5,7 +5,7 @@ import logo from "../../Images/logo.svg";
 import Success from "./Success";
 import StripeCheckout from "../Stripe/StripeCheckout";
 
-function Search() {
+function SearchRecomand(search) {
   const [data, setData] = useState("");
   const [course, setCourse] = useState([]);
   const [courseID, setCourseID] = useState([]);
@@ -107,8 +107,9 @@ function Search() {
     );
     const response = await Data.json();
     if (response.statusCode === 200) {
+      
       setCourse(response.data);
-      // console.log(response.data);
+      console.log("respocen", response.data);
     }
     setData("");
   };
@@ -311,9 +312,14 @@ function Search() {
     }
   };
 
-  const filteredCourses = course.filter((courseItem) =>
-    courseItem.coursename.toLowerCase().includes(data.toLowerCase())
+  const filteredCourses = course.filter(
+    (courseItem) =>
+      Array.isArray(courseItem.enrolledStudent) &&
+      !courseItem.enrolledStudent.includes(ID)
   );
+
+  console.log("filteredCourses", course);
+  
 
   return (
     <>
@@ -415,4 +421,4 @@ function Search() {
   );
 }
 
-export default Search;
+export default SearchRecomand;

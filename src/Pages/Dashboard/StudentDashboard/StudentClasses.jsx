@@ -151,7 +151,8 @@ function StudentClasses() {
         )}
 
         {/* Class Details and Video Player */}
-        <div className="w-[80%] ">
+        {selectedClass && 
+        <div className="w-[100%] ">
           {selectedClass ? (
             <div className="bg-[#1E293B]  flex-col justify-center rounded-lg p-4 shadow-lg">
               <div
@@ -164,16 +165,16 @@ function StudentClasses() {
                 Class Details
               </h2>
               <div className="space-y-4 flex justify-center flex-col">
-                <div className="aspect-w-16 aspect-h-9">
+                <div className="w-full flex p-5 items-center">
                   <YouTube
                     videoId={extractVideoId(selectedClass.link)}
                     opts={opts}
-                    className="w-full"
+                    className="w-[100%] flex justify-center"
                   />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold">{selectedClass.title}</h3>
-                  <p className="text-sm text-gray-300 mt-2">
+                  <h3 className="text-2xl font-bold">{selectedClass.title}</h3>
+                  <p className="text-lg text-gray-300 mt-2">
                     {selectedClass.description}
                   </p>
                   <div className="mt-4">
@@ -195,7 +196,7 @@ function StudentClasses() {
               <p className="text-gray-400">Select a class to view details</p>
             </div>
           )}
-        </div>
+        </div>}
       </div>
     </div>
   );
