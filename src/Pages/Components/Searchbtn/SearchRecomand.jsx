@@ -87,7 +87,6 @@ function SearchRecomand(search) {
   };
 
   useEffect(() => {
-   
     getData();
   }, []);
 
@@ -107,7 +106,6 @@ function SearchRecomand(search) {
     );
     const response = await Data.json();
     if (response.statusCode === 200) {
-      
       setCourse(response.data);
       console.log("respocen", response.data);
     }
@@ -319,87 +317,89 @@ function SearchRecomand(search) {
   );
 
   console.log("filteredCourses", course);
-  
 
   return (
     <>
-    {search && 
-      <div className="search mb-4">
-        <img
-          src="https://www.figma.com/file/6b4R8evBkii6mI53IA4vSS/image/6c476f454537d7f27cae2b4d0f31e2b59b3020f5"
-          width={30}
-          alt=""
-        />
-        <input
-          type="text"
-          placeholder="Search for courses..."
-          value={data}
-          onChange={(e) => setData(e.target.value)}
-        />
-      </div>
-      }
+      {search && (
+        <div className="search mb-4">
+          <img
+            src="https://www.figma.com/file/6b4R8evBkii6mI53IA4vSS/image/6c476f454537d7f27cae2b4d0f31e2b59b3020f5"
+            width={30}
+            alt=""
+          />
+          <input
+            type="text"
+            placeholder="Search for courses..."
+            value={data}
+            onChange={(e) => setData(e.target.value)}
+          />
+        </div>
+      )}
       <div className="overflow-auto grid md:grid-cols-1 lg:grid-cols-2 gap-6 mx-4 justify-center items-center ">
         {filteredCourses.length > 0 ? (
-          filteredCourses.map((Data) => (
-            <div
-              key={Data._id}
-              className="relative bg-white shadow-lg rounded-lg p-4 mb-6 max-w-lg flex flex-col md:flex-row items-center gap-6 hover:shadow-xl transition-all duration-300"
-            >
-              <div className="w-full md:w-1/3">
-                <img
-                  src={Data.thumbnailimage}
-                  alt={Data.coursename}
-                  className="w-full h-full object-contain rounded-lg"
-                />
-              </div>
-
-              <div className="w-full md:w-2/3 flex flex-col justify-between">
-                <div>
-                  <h2 className="text-xl font-bold text-blue-900">
-                    {Data.coursename}
-                  </h2>
-                  <p className="text-gray-600">{Data.description}</p>
-                  <div className="mt-2 text-sm text-gray-500">
-                    <p>
-                      Teacher: {Data.enrolledteacher.Firstname}{" "}
-                      {Data.enrolledteacher.Lastname}
-                    </p>
-                    <p>Email: {Data.enrolledteacher.Email} </p>
-                  </div>
+          [...filteredCourses]
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 3)
+            .map((Data) => (
+              <div
+                key={Data._id}
+                className="relative bg-white shadow-lg rounded-lg p-4 mb-6 max-w-lg flex flex-col md:flex-row items-center gap-6 hover:shadow-xl transition-all duration-300"
+              >
+                <div className="w-full md:w-1/3">
+                  <img
+                    src={Data.thumbnailimage}
+                    alt={Data.coursename}
+                    className="w-full h-full object-contain rounded-lg"
+                  />
                 </div>
 
-                <div className="flex items-center justify-between mt-4">
-                  <div className="flex flex-col items-center justify-center">
-                    <p className="text-gray-900">
-                    <p className="text-gray-900">
-                      Price: <span className="font-bold">{Data.price}</span>
-                    </p>
-                      Enrolled: {Data.enrolledStudent.length}
-                    </p>
+                <div className="w-full md:w-2/3 flex flex-col justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold text-blue-900">
+                      {Data.coursename}
+                    </h2>
+                    <p className="text-gray-600">{Data.description}</p>
+                    <div className="mt-2 text-sm text-gray-500">
+                      <p>
+                        Teacher: {Data.enrolledteacher.Firstname}{" "}
+                        {Data.enrolledteacher.Lastname}
+                      </p>
+                      <p>Email: {Data.enrolledteacher.Email} </p>
+                    </div>
                   </div>
 
-                  {idArray.includes(Data._id) ? (
-                    <div className="bg-green-900 text-white py-2 px-4 rounded-lg cursor-not-allowed">
-                      Already Enrolled
+                  <div className="flex items-center justify-between mt-4">
+                    <div className="flex flex-col items-center justify-center">
+                      <p className="text-gray-900">
+                        <p className="text-gray-900">
+                          Price: <span className="font-bold">{Data.price}</span>
+                        </p>
+                        Enrolled: {Data.enrolledStudent.length}
+                      </p>
                     </div>
-                  ) : Data.enrolledStudent.length < 20 ? (
-                    <div
-                      onClick={() => {
-                        handleEnrollClick(Data);
-                      }}
-                      className="bg-blue-900 text-white py-2 px-4 rounded-lg cursor-pointer hover:bg-blue-700 transition-all duration-200"
-                    >
-                      Enroll Now
-                    </div>
-                  ) : (
-                    <div className="bg-red-900 text-white py-2 px-4 rounded-lg cursor-not-allowed">
-                      Course Full
-                    </div>
-                  )}
+
+                    {idArray.includes(Data._id) ? (
+                      <div className="bg-green-900 text-white py-2 px-4 rounded-lg cursor-not-allowed">
+                        Already Enrolled
+                      </div>
+                    ) : Data.enrolledStudent.length < 20 ? (
+                      <div
+                        onClick={() => {
+                          handleEnrollClick(Data);
+                        }}
+                        className="bg-blue-900 text-white py-2 px-4 rounded-lg cursor-pointer hover:bg-blue-700 transition-all duration-200"
+                      >
+                        Enroll Now
+                      </div>
+                    ) : (
+                      <div className="bg-red-900 text-white py-2 px-4 rounded-lg cursor-not-allowed">
+                        Course Full
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            ))
         ) : (
           <p className="text-center text-gray-500 mt-6">No courses found</p>
         )}
