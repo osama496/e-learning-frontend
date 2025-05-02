@@ -127,7 +127,7 @@ const TeacherDocument = () => {
       <header className="flex flex-col md:flex-row items-center justify-between gap-6 px-6 py-4 bg-[#0D286F]">
         <div className="flex items-center gap-3">
           <img src={logo} className="w-12 md:w-14" alt="Logo" />
-          <h1 className="text-xl md:text-2xl text-[#4E84C1] font-bold">Shiksharthee</h1>
+          <h1 className="text-xl md:text-2xl text-[#4E84C1] font-bold"> SkillBridge</h1>
         </div>
         <h2 className="text-white text-lg md:text-xl text-center md:text-left">
           Document Verification (Teacher)

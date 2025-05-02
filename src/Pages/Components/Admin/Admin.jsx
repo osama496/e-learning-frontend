@@ -100,7 +100,7 @@ const Admin = () => {
         <NavLink to="/" className="flex items-center gap-3">
           <img src={logo} alt="logo" className="w-10 md:w-14" />
           <h1 className="text-xl md:text-2xl font-bold text-[#4E84C1]">
-            Shiksharthee
+             SkillBridge
           </h1>
         </NavLink>
         <div className="flex items-center gap-6">

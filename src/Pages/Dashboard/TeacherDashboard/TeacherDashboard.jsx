@@ -64,7 +64,7 @@ function TeacherDashboard() {
         <NavLink to="/">
           <div className="flex items-center gap-3">
             <img src={logo} className="w-14" alt="" />
-            <h1 className="text-2xl text-[#4E84C1] font-bold">Shiksharthee</h1>
+            <h1 className="text-2xl text-[#4E84C1] font-bold"> SkillBridge</h1>
           </div>
         </NavLink>
         
@@ -82,7 +82,7 @@ function TeacherDashboard() {
       <div className="bg-[#008280] flex justify-between items-center">
         <div className=" text-[#071645] font-semibold text-5xl ml-72">
           <h1 className="mb-5">
-            Welcome to <span className="text-white">Shiksharthee</span>
+            Welcome to <span className="text-white"> SkillBridge</span>
           </h1>
           <h3 className="ml-16 text-[#071645]">
             {data.Firstname} {data.Lastname}
