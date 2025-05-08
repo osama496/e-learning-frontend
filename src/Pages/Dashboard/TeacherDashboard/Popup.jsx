@@ -15,11 +15,13 @@ function Popup({ onClose, subject, existingCourse }) {
   console.log("existingCourse", existingCourse);
 
   const addCourse = async () => {
-    if (!desc) return alert("Fill the description.");
+    if (!course.trim()) return alert("Course name is required.");
+    if (!desc.trim()) return alert("Description is required.");
+    if (!existingCourse && !thumbnailimage) return alert("Thumbnail image is required.");
     if (price !== 0 && price < 300) {
-      alert("Price must be either Free (0) or at least 300.");
-      return;
+      return alert("Price must be either Free (0) or at least 300.");
     }
+
 
     try {
       setLoading(true);
@@ -41,16 +43,14 @@ function Popup({ onClose, subject, existingCourse }) {
 
       if (existingCourse) {
         // Edit Mode
-        apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/course/${
-          existingCourse._id
-        }/update/${existingCourse.enrolledteacher}`;
+        apiURL = `${import.meta.env.VITE_API_BASE_URL}/api/course/${existingCourse._id
+          }/update/${existingCourse.enrolledteacher}`;
         method = "PUT";
       } else {
         // Create Mode
         const courseName = (course || subject).replace(/\s+/g, "");
-        apiURL = `${
-          import.meta.env.VITE_API_BASE_URL
-        }/api/course/${courseName}/create/${ID}`;
+        apiURL = `${import.meta.env.VITE_API_BASE_URL
+          }/api/course/${courseName}/create/${ID}`;
         method = "POST";
       }
 
