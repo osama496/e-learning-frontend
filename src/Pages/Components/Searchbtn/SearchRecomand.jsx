@@ -94,7 +94,7 @@ function SearchRecomand(search) {
 
   const GetALLCourses = async () => {
     const Data = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/api/course/all`,
+      `${import.meta.env.VITE_API_BASE_URL}/api/student/${ID}/recommendations`,
       {
         method: "GET",
         mode: "cors",
@@ -106,7 +106,7 @@ function SearchRecomand(search) {
     );
     const response = await Data.json();
     if (response.statusCode === 200) {
-      setCourse(response.data);
+      setCourse(response.data.recommendedCourses);
       console.log("respocen", response.data);
     }
     setData("");
